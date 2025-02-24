@@ -19,8 +19,11 @@ uploadForm.addEventListener("submit", async (event) => {
 
     // Display the script link
     scriptLinkContainer.innerHTML = `
-      <p>Embed this script:</p>
-      <pre>&lt;script src="http://localhost:8080/ask/${dynamicScriptId}";"&gt;&lt;/script&gt;</pre>
+    //   <p>Embed this script:</p>
+    //   <pre>&lt;script src="http://localhost:8080/ask/${dynamicScriptId}";"&gt;&lt;/script&gt;</pre>
+    // `;
+     <p>Embed this script:</p>
+      <pre>&lt;iframe src="https://voice-d8xl.onrender.com/ask/${dynamicScriptId}"allow="microphone" style="border: none;" &gt;&lt;/iframe&gt;</pre>
     `;
 
     askButton.style.display = "block";
