@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Voice Q&A</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- <h1>Dynamic Voice Q&A System</h1> -->
+
+  <!-- <form id="uploadForm">
+    <label for="clientName">Client Name:</label>
+    <input type="text" id="clientName" name="clientName" placeholder="Enter client name" required />
+    <br><br>
+    
+<!-- 
+    <label for="clientSelect">Select Client:</label>
+    <select id="clientSelect" name="clientSelect" required>
+      <option value="">Select a client</option>
+      <option value="client1">Client 1</option>
+      <option value="client2">Client 2</option>
+      <option value="client3">Client 3</option>
+      
+    </select>
+    <br><br> -->
+  <!-- Upload Form -->
+  
+    <!-- <label for="fileInput">Upload Excel File:</label>
+    <input type="file" id="fileInput" name="file" accept=".xlsx, .xls" required />
+    <button type="submit">Upload</button>
+  </form> -->
+
+  <!-- Script Link Container -->
+  <!-- <div id="scriptLinkContainer"></div> -->
+
+  <!-- Ask Me Anything Button -->
+  <!-- <button id="askButton" style="display: none;">Ask Me Anything</button> -->
+  <form id="uploadForm">
+    <label for="clientName">Client Name:</label>
+    <input type="text" id="clientName"  placeholder="Enter client name" required />
+    <br><br>
+  
+    <label for="fileInput">Upload Excel File:</label>
+    <input type="file" id="fileInput" name="file" accept=".xlsx, .xls" required />
+    <button type="submit">Upload</button>
+  </form>
+  <button onclick="window.location.href='script.html'">View Uploaded Scripts</button>
+  <!-- Script Link Container -->
+  <div id="scriptLinkContainer"></div>
+  
+  <!-- Ask Me Anything Button -->
+  <button id="askButton" style="display: none;">Ask Me Anything</button>
+  
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>

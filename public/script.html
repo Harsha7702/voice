@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stored Scripts</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      color: #222;
+    }
+
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      padding: 10px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      padding: 6px 10px;
+      margin: 3px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .edit-btn { background: #f0ad4e; color: white; }
+    .delete-btn { background: #d9534f; color: white; }
+    .excel-btn { background: #5bc0de; color: white; }
+    .add-btn { background: #5cb85c; color: white; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #fff;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #222;
+      color: white;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    td a {
+      color: #222;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    td a:hover {
+      text-decoration: underline;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 6px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Uploaded Script Links</h1>
+    <!-- <button class="btn add-btn" onclick="window.location.href='index.html'">Go Back</button> -->
+    <table>
+      <thead>
+        <tr>
+          <th>Client Name</th>
+          <th>Script ID</th>
+          <th>File Name</th>
+          <th>URL</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="scriptList"></tbody>
+    </table>
+  </div>
+
+  <div id="editModal" class="modal">
+    <h3>Edit Entry</h3>
+    <input type="text" id="editClient" placeholder="Client Name">
+    <button class="btn edit-btn" onclick="saveEdit()">Save</button>
+    <button class="btn" onclick="closeModal()">Cancel</button>
+  </div>
+
+  <div id="excelModal" class="modal">
+    <h3>Edit Excel File</h3>
+    <table id="excelTable">
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Answer</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn edit-btn" onclick="saveExcelChanges()">Save Changes</button>
+    <button class="btn" onclick="closeExcelModal()">Close</button>
+  </div>
+  <button class="btn add-btn" onclick="window.location.href='index.html'">Go Back</button>
+
+  <script>
+    let currentEditId = null;
+    let currentExcelFile = null;
+
+    async function fetchScripts() {
+      try {
+        const response = await fetch("http://localhost:8080/script-links");
+        const data = await response.json();
+
+        const scriptList = document.getElementById("scriptList");
+        scriptList.innerHTML = "";
+
+        if (data.scripts.length === 0) {
+          scriptList.innerHTML = <tr><td colspan="5">No scripts available.</td></tr>;
+          return;
+        }
+
+        data.scripts.forEach(script => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${script.client}</td>
+            <td>${script.scriptId}</td>
+            <td>${script.fileName}</td>
+            <td><a href="${script.url}" target="_blank">${script.url}</a></td>
+            <td>
+              <button class="btn edit-btn" onclick="openEditModal('${script.scriptId}', '${script.client}')">Edit</button>
+              <button class="btn delete-btn" onclick="deleteScript('${script.scriptId}')">Delete</button>
+              <button class="btn excel-btn" onclick="openExcel('${script.fileName}')">Edit Excel</button>
+            </td>
+          `;
+          scriptList.appendChild(row);
+        });
+      } catch (error) {
+        console.error("Error fetching script links:", error);
+      }
+    }
+
+    function openExcel(fileName) {
+      currentExcelFile = fileName;
+      fetch(`http://localhost:8080/get-excel/${fileName}`)
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.querySelector("#excelTable tbody");
+          tableBody.innerHTML = "";
+          data.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td contenteditable="true">${row.question}</td><td contenteditable="true">${row.answer}</td>`;
+            tableBody.appendChild(tr);
+          });
+          document.getElementById("excelModal").style.display = "block";
+        });
+    }
+
+    function saveExcelChanges() {
+      const rows = document.querySelectorAll("#excelTable tbody tr");
+      const updatedData = Array.from(rows).map(row => ({
+        question: row.cells[0].innerText,
+        answer: row.cells[1].innerText
+      }));
+
+      fetch(`http://localhost:8080/update-excel/${currentExcelFile}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData)
+      });
+      closeExcelModal();
+    }
+
+    function closeExcelModal() {
+      document.getElementById("excelModal").style.display = "none";
+    }
+
+    window.onload = fetchScripts;
+  </script>
+</body>
+</html>
