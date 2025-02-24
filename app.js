@@ -6,7 +6,7 @@ const multer = require("multer");
 const path = require("path");
 const Fuse = require("fuse.js");
 const fs = require("fs");
-const AWS = require("aws-sdk");
+// const AWS = require("aws-sdk");
 require("dotenv").config(); // Load environment variables
 
 const app = express();
@@ -145,13 +145,13 @@ app.post("/process-speech/:id", (req, res) => {
 });
 
 // AWS Translate Setup (Use environment variables for security)
-AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,        // Use environment variables
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Use environment variables
-  region: "us-east-1",
-});
+// AWS.config.update({
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,        // Use environment variables
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Use environment variables
+//   region: "us-east-1",
+// });
 
-const translate = new AWS.Translate();
+// const translate = new AWS.Translate();
 
 // Serve the Ask Page
 app.get("/ask/:id", (req, res) => {
